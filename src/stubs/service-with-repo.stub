@@ -1,0 +1,32 @@
+<?php
+
+use Maltex\Generators\Contracts\ServiceContract;
+use {{repositoryClass}};
+
+class {{class}} implements ServiceContract
+{
+  /**
+   * @var {{repositoryClass}}
+   */
+   protected $repository;
+
+   /**
+    * Inject the repository
+    *
+    * @return void
+    */
+    public function __construct({{repositoryClass}} $repository)
+    {
+       $this->repository = repository;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function execute($data)
+    {
+        // TODO Add business logic
+
+        $this->repository->{{serviceFunction}}($data)
+    }
+}

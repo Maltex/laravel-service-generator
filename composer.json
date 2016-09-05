@@ -1,0 +1,21 @@
+{
+  "name": "maltex/laravel-service-generators",
+  "description": "Provide command line generation of service layer files.",
+  "keywords": ["laravel", "generators", "services"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "James Bennett",
+      "email": "james@maltex.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "illuminate/support": "~5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Maltex\\Generators\\": "src/"
+    }
+  }
+}
