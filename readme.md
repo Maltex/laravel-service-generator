@@ -11,7 +11,7 @@ Install the package using composer
 composer require maltex/laravel-service-generators
 ```
 ### 2. Add Service Provider
-Make the package available to your application by adding the service provider. This is not required for production code so register it by adding the following to your ```app/Providers/AppServiceProvider.php```, like so:
+Make the package available to your application by adding the service provider. This is not required for production code so register it by adding the following to your ```app/Providers/AppServiceProvider.php```:
 
 ```php
 public function register()
@@ -21,13 +21,11 @@ public function register()
     }
 }
 ```
-# Conventions
-Currently, the package supports Repositories so long as they're in the ```app/Repositories``` folder.
 
 # Examples
 Let's say you're working with a *Client* model. You've created your front end screen, your routes and a controller end-point. Now we need to manage the business logic.
 
-``` php artisan make:service AddClientService --repo=Client ```
+``` php artisan make:service AddClientService --repo=Client --func=addClient  ```
 
 You will see that a Services folder is now available in your application with the *AddClientService.php* file.
 

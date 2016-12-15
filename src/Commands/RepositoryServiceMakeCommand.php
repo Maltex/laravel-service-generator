@@ -6,7 +6,7 @@ use Illuminate\Console\AppNamespaceDetectorTrait;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 
-class ServiceMakeCommand extends Command
+class RepositoryServiceMakeCommand extends Command
 {
     use AppNamespaceDetectorTrait;
 
@@ -22,16 +22,17 @@ class ServiceMakeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'make:service 
+    protected $signature = 'make:repo-service 
                             {name : The name of your service} 
-                            {--repo= : The name of the repository}';
+                            {--repo= : The name of the repository}
+                            {--func= : The name of repository function';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a service class for a user action';
+    protected $description = 'Create a service class for a repository';
 
     /**
      * The filesystem instance.
@@ -64,8 +65,6 @@ class ServiceMakeCommand extends Command
     public function handle()
     {
         $this->makeService();
-
-        $this->info('Service created successfully.');
 
         $this->composer->dumpAutoloads();
     }
@@ -114,6 +113,8 @@ class ServiceMakeCommand extends Command
     protected function addServiceFile()
     {
         $this->files->put($this->getPath(), $this->compileServiceStub());
+
+        $this->info('Service created successfully.');
     }
 
     /**
@@ -123,7 +124,7 @@ class ServiceMakeCommand extends Command
      */
     protected function compileServiceStub()
     {
-        $stub = $this->getStub();
+        $stub = $this->files->get($this->getStub());
 
         $this->replaceRepoDependency($stub)
             ->replaceClassName($stub)
@@ -136,9 +137,6 @@ class ServiceMakeCommand extends Command
      * Configure a function name for the repository
      * based on the service.
      *
-     * i.e.
-     * AddClientService will produce addClient()
-     *
      * @param $stub
      * @return $this
      */
@@ -149,7 +147,7 @@ class ServiceMakeCommand extends Command
             return $this;
         }
 
-        $repositoryNamespace = $this->getAppNamespace() . '\\' . $this->configureRepositoryFunctionName();
+        $repositoryNamespace = $this->getAppNamespace() . $this->configureRepositoryName();
 
         $stub = str_replace('{{repositoryClass}}', $repositoryNamespace, $stub);
 
@@ -171,12 +169,20 @@ class ServiceMakeCommand extends Command
         return $this;
     }
 
+    /**
+     * Replace the function name for service
+     *
+     * @param $stub
+     * @return $this
+     */
     protected function replaceRepoServiceFunction(&$stub)
     {
         // not required for non-repo
         if(is_null($this->getRepository())) {
             return $this;
         }
+
+        $stub = str_replace('{{serviceFunction}}', $this->configureRepositoryFunctionName(), $stub);
 
         return $this;
     }
@@ -189,7 +195,9 @@ class ServiceMakeCommand extends Command
     protected function getStub()
     {
         // switch stub depending on repo option
-        return is_null($this->getRepository()) ? 'service.stub' : 'service-with-repo.stub';
+        $fileName = is_null($this->getRepository()) ? 'service.stub' : 'service-with-repo.stub';
+        
+        return __DIR__ . '/../stubs/' .$fileName;
     }
 
     /**
@@ -225,7 +233,7 @@ class ServiceMakeCommand extends Command
     /**
      * Get the entered repository
      *
-     * @return mixed
+     * @return string
      */
     protected function getRepository()
     {
@@ -233,14 +241,34 @@ class ServiceMakeCommand extends Command
     }
 
     /**
+     * Get the repository function name
+     * 
+     * @return string
+     */
+    protected function getRepositoryFunctionName()
+    {
+        return $this->option('func');
+    }
+
+    /**
+     * Get the repository name from configuration
+     *
+     * @return string
+     */
+    protected function getRepositoryName()
+    {
+        return config('service-gen.repository_dir')
+    }
+
+    /**
      * Set a name for the function called by
      * the repository
      *
-     * @return mixed
+     * @return string
      */
     protected function configureRepositoryFunctionName()
     {
-        $name = ucwords($this->getServiceName());
+        $name = ucwords($this->getRepositoryFunctionName());
 
         return camel_case(str_replace('Service', '', $name));
     }

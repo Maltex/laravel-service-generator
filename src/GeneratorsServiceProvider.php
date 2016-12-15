@@ -12,7 +12,9 @@ class GeneratorsServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->publishes([
+            __DIR__ . '/config/service-gen.php' => config_path('service-gen.php'),
+        ]);
     }
     /**
      * Register the application services.
@@ -22,15 +24,28 @@ class GeneratorsServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerServiceGenerator();
+        $this->registerRepositoryServiceGenerator();
     }
+
     /**
      * Register the make:service command
      */
     private function registerServiceGenerator()
     {
         $this->app->singleton('command.maltex.service', function ($app) {
-            return $app['Maltex\Generators\Commands\GeneratorMakeCommand'];
+            return $app['Maltex\Generators\Commands\ServiceMakeCommand'];
         });
         $this->commands('command.maltex.service');
+    }
+
+    /**
+     * Register the make:repo-service command
+     */
+    private function registerRepositoryServiceGenerator()
+    {
+        $this->app->singleton('command.maltex.repo-service', function ($app) {
+            return $app['Maltex\Generators\Commands\RepositoryServiceMakeCommand'];
+        });
+        $this->commands('command.maltex.repo-service');
     }
 }

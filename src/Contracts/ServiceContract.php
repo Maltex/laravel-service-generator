@@ -1,5 +1,7 @@
 <?php
 
+namespace Maltex\Generators\Contracts;
+
 interface ServiceContract
 {
     /**
